@@ -6,16 +6,16 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin)
 
-link_directories(${CMAKE_BINARY_DIR}/build/lib)
-
 ##################################################################
 # GLEW
 ##################################################################
 
-set(BUILD_UTILS OFF CACHE BOOL "utilities")
+#set(BUILD_UTILS OFF CACHE BOOL "utilities")
 
 include_directories(lib/glew/include)
 add_subdirectory(lib/glew/build/cmake)
+
+return()
 
 ##################################################################
 # GLFW
@@ -34,3 +34,5 @@ add_subdirectory(lib/glfw)
 ##################################################################
 # 
 ##################################################################
+
+link_directories(${CMAKE_BINARY_DIR}/build/lib)
