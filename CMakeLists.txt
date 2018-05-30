@@ -74,7 +74,7 @@ link_directories(${CMAKE_SOURCE_DIR}/build/lib)
 
 set(EXAMPLES
 	00-hello
-	# ...
+	01-shaders
 )
 
 foreach(EXAMPLE ${EXAMPLES})
