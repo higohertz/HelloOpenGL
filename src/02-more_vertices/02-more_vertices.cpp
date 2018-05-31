@@ -69,13 +69,14 @@ const GLchar* vertexShaderSource = ""
     " #version 330 core"
     " "
     " layout (location = 0) in vec3 position;"
+    " layout (location = 1) in vec4 color;"
     " "
     " out vec4 vertexColor; // Передаем цвет во фрагментный шейдер \n"
     " "
     " void main()"
     " {"
     "    gl_Position = vec4(position.x, position.y, position.z, 1.0);"
-    "    vertexColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);"
+    "    vertexColor = vec4(color.x, color.y, color.z, color.w); \n"
     " }";
 
 const GLchar* fragmentShaderSource = ""
@@ -88,7 +89,7 @@ const GLchar* fragmentShaderSource = ""
     " "
     " void main()"
     " {"
-    "    color = vertexColor + uniformColor;"
+    "    color = vertexColor + uniformColor; \n"
     " }";
 
 /****************************************************************************************/
@@ -142,13 +143,14 @@ int main()
     glDeleteShader(fragmentShader);
 
     /***********/
-
+    
     // Set up vertex data (and buffer(s)) and attribute pointers
-    GLfloat vertices[] = {
-        -0.5f, -0.5f, 0.0f, // Left
-         0.5f, -0.5f, 0.0f, // Right
-         0.0f,  0.5f, 0.0f  // Top
-    };
+	GLfloat vertices[] = {
+    	// Позиции           // Цвета
+        -0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f, 0.0f,  // Нижний правый угол
+    	 0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 0.0f,  // Нижний левый угол
+    	 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 0.0f,  // Верхний угол
+	};
     
     // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
     GLuint VAO;
@@ -160,12 +162,16 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	// layout = 0
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
+    // layout = 1
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
+
 	glUseProgram(shaderProgram);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
-
     glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs)
 
     // Game loop
@@ -185,7 +191,8 @@ int main()
 
     	// Обновляем цвет формы
     	GLint uniformColor = glGetUniformLocation(shaderProgram, "uniformColor");
-	    glUniform4f(uniformColor, 0.0f, (sin(glfwGetTime())/2)+0.5, 0.0f, 1.0f);
+        //glUniform4f(uniformColor, 0.0f, (sin(glfwGetTime())/2)+0.5, 0.0f, 1.0f);
+        glUniform4f(uniformColor, 0.0f, 0.0f, 0.0f, 0.0f);
 
         // Draw our first triangle
         glBindVertexArray(VAO);

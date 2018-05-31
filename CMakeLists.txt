@@ -75,10 +75,11 @@ link_directories(${CMAKE_SOURCE_DIR}/build/lib)
 set(EXAMPLES
 	00-hello
 	01-shaders
+	02-more_vertices
 )
 
 foreach(EXAMPLE ${EXAMPLES})
-	add_executable(${EXAMPLE} WIN32 src/${EXAMPLE}/${EXAMPLE}.cpp ${COMMON_HEADERS})
+	add_executable(${EXAMPLE} WIN32 src/${EXAMPLE}/${EXAMPLE}.cpp ${ASSET_FILES} ${COMMON_HEADERS})
 	set_property(TARGET ${EXAMPLE} PROPERTY DEBUG_POSTFIX _d)
 	target_link_libraries(${EXAMPLE} ${COMMON_LIBS})
 endforeach(EXAMPLE)
