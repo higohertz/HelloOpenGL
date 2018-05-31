@@ -38,6 +38,8 @@ if(HZ_BUILD_COMMON_LIBS)
 	set(GLFW_DOCUMENT_INTERNALS OFF CACHE BOOL "Include internals in documentation")
 	add_subdirectory(lib/glfw)
 
+	# LIB: GLM
+	add_subdirectory(lib/glm)
 endif()
 unset(HZ_BUILD_COMMON_LIBS CACHE)
 
@@ -52,7 +54,7 @@ if(WIN32)
 	message(STATUS "WIN32 add libs: " ${COMMON_LIBS} )
 elseif (UNIX)
 	if(APPLE)
-		set(COMMON_LIBS ${OPENGL_LIBRARIES} glew glfw stdc++ "-framework Foundation" "-framework Cocoa" "-framework OpenGL" "-framework CoreVideo" "-framework IOKit")
+		set(COMMON_LIBS ${OPENGL_LIBRARIES} glew glfw glm stdc++ "-framework Foundation" "-framework Cocoa" "-framework OpenGL" "-framework CoreVideo" "-framework IOKit")
 		message(STATUS "APPLE add libs: " ${COMMON_LIBS} )
 	else()
 		set(COMMON_LIBS vermilion ${OPENGL_LIBRARIES} glew glfw GL rt dl)
@@ -76,6 +78,7 @@ set(EXAMPLES
 	00-hello
 	01-shaders
 	02-more_vertices
+	03-rotate
 )
 
 foreach(EXAMPLE ${EXAMPLES})
