@@ -39,6 +39,7 @@ if(HZ_BUILD_COMMON_LIBS)
 	add_subdirectory(lib/glfw)
 
 	# LIB: GLM
+	set(GLM_STATIC_LIBRARY_ENABLE ON CACHE BOOL "GLM static library")
 	add_subdirectory(lib/glm)
 endif()
 unset(HZ_BUILD_COMMON_LIBS CACHE)
@@ -71,6 +72,7 @@ endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/lib/glew/include)
 include_directories(${CMAKE_SOURCE_DIR}/lib/glfw/include)
+include_directories(${CMAKE_SOURCE_DIR}/lib/glm)
 
 link_directories(${CMAKE_SOURCE_DIR}/build/lib)
 

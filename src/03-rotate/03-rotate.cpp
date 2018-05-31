@@ -7,12 +7,19 @@
 // https://habr.com/post/311808/
 
 #define GLEW_STATIC
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cstdlib>
 #include <stdio.h>
 #include <math.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/ext.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 /****************************************************************************************/
 
@@ -71,25 +78,27 @@ const GLchar* vertexShaderSource = ""
     " layout (location = 0) in vec3 position;"
     " layout (location = 1) in vec4 color;"
     " "
-    " out vec4 vertexColor; // Передаем цвет во фрагментный шейдер \n"
+    " uniform mat4 transformPosition; // Из кода OpenGL: матрица трансформации \n"
+    " uniform vec4 transformColor;    // Из кода OpenGL: цветовая добавка \n"
+    " "
+    " out vec4 vertexColor;  // Передаем цвет во фрагментный шейдер \n"
     " "
     " void main()"
     " {"
-    "    gl_Position = vec4(position, 1.0);"
-    "    vertexColor = vec4(color.x, color.y, color.z, color.w); \n"
+    "    gl_Position = transformPosition * vec4(position, 1.0);"
+    "    vertexColor = color + transformColor; \n"
     " }";
 
 const GLchar* fragmentShaderSource = ""
     " #version 330 core"
     " "
-    " in vec4 vertexColor;       // Входная переменная из вершинного шейдера (то же название и тот же тип) \n"
-    " uniform vec4 uniformColor; // Мы устанавливаем значение этой переменной в коде OpenGL \n"
+    " in vec4 vertexColor;   // Входная переменная из вершинного шейдера (то же название и тот же тип) \n"
     " "
     " out vec4 color;"
     " "
     " void main()"
     " {"
-    "    color = vertexColor + uniformColor; \n"
+    "    color = vertexColor; \n"
     " }";
 
 /****************************************************************************************/
@@ -169,8 +178,6 @@ int main()
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
 
-	glUseProgram(shaderProgram);
-
     glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
     glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs)
 
@@ -189,11 +196,17 @@ int main()
         // Активируем шейдерную программу
     	glUseProgram(shaderProgram);
 
-    	// Обновляем цвет формы
-    	GLint uniformColor = glGetUniformLocation(shaderProgram, "uniformColor");
-        //glUniform4f(uniformColor, 0.0f, (sin(glfwGetTime())/2)+0.5, 0.0f, 1.0f);
-        glUniform4f(uniformColor, 0.0f, 0.0f, 0.0f, 0.0f);
-
+    	// Обновляем  матрицу трансформации и цвет формы
+        glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, (GLfloat)glfwGetTime()*50.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	   	glm::mat4 mvp = /*projection * view **/ model;
+        GLuint transformPosition = glGetUniformLocation(shaderProgram, "transformPosition");
+		glUniformMatrix4fv(transformPosition, 1, GL_FALSE, glm::value_ptr(mvp));
+    
+        GLint transformColor = glGetUniformLocation(shaderProgram, "transformColor");
+        glUniform4f(transformColor, 0.0f, (sin(glfwGetTime())/2)+0.5f, 0.0f, 1.0f);
+    
         // Draw our first triangle
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
